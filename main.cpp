@@ -11,7 +11,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-#define _YANDEX_SERVER_TESTING_ 0
+#define _YANDEX_SERVER_TESTING_ 01
 #define _SMALL_OUTPUT_EXPECTED_ 01
 
 void JSONinterface(istream& in, ostream& out, Catalogue& catalogue)
