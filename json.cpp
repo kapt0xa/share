@@ -41,6 +41,7 @@ namespace json
 		ostream& out;
 		int indent_step = 4;
 		int indent = 0;
+		bool dont_put_bracket_in_next_line = true;
 
 		void NextLine()
 		{
@@ -49,6 +50,16 @@ namespace json
 			{
 				out.put(' ');
 			}
+		}
+
+		void PrepareToOpenBracket()
+		{
+			if (dont_put_bracket_in_next_line)
+			{
+				dont_put_bracket_in_next_line = false;
+				return;
+			}
+			NextLine();
 		}
 
 		PrintContext Indented()
@@ -146,6 +157,7 @@ namespace json
 	void PrintValue(const Array& arr, PrintContext& context)
 	{
 		auto& out = context.out;
+		context.PrepareToOpenBracket();
 		out << '[';
 		auto inside_context = context.Indented();
 		bool first_loop = true;
@@ -169,8 +181,10 @@ namespace json
 	void PrintValue(const Dict& dict, PrintContext& context)
 	{
 		auto& out = context.out;
+		context.PrepareToOpenBracket();
 		out << '{';
 		auto inside_context = context.Indented();
+		inside_context.dont_put_bracket_in_next_line = false;
 		bool first_loop = true;
 		for (const auto& [name, val] : dict)
 		{
@@ -184,7 +198,7 @@ namespace json
 			}
 			inside_context.NextLine();
 			PrintValue(name, inside_context);
-			out << ':';
+			out << ':' << ' ';
 			PrintValue(val, inside_context);
 		}
 		context.NextLine();
@@ -196,7 +210,7 @@ namespace json
 		visit([&context](const auto& value)
 			{
 				PrintValue(value, context);
-			}, val);
+			}, dynamic_cast<const Node::variant&>(val));
 	}
 
 	//vv====================================================================================== read functions:
