@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include <unordered_map>
+#include <map>
 #include <string>
 #include <vector>
 #include <variant>
@@ -17,7 +17,7 @@ namespace json
     using std::ptrdiff_t;
 
     class Node;
-    using Dict = std::unordered_map<string, Node>;
+    using Dict = std::map<string, Node>;
     using Array = std::vector<Node>;
 
     class ParsingError : public std::runtime_error {

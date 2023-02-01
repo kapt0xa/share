@@ -9,7 +9,7 @@ using namespace std;
 namespace json
 {
 	const bool do_logs = true;
-	ostream* const log_err_stream = &cerr; // can cause warnings, remove "const" to cancel warnings
+	ostream* /*const*/ log_err_stream = &cerr; // can cause warnings, remove "const" to cancel warnings
 	mutex* const log_err_mutex = nullptr;
 	void LogWarning(string_view message)
 	{
