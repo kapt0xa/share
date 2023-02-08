@@ -5,7 +5,7 @@
 
 namespace geo
 {
-    struct Coordinates 
+    struct Coordinates
     {
     private:
         bool operator==(const Coordinates& other) const;

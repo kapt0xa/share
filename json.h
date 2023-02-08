@@ -79,6 +79,6 @@ namespace json
 
     Document Load(istream& input);
 
-    void Print(const Document& doc, ostream& output, int indent_step = 0, int start_indent = 0);
+    void Print(const Document& doc, ostream& output, int indent_step = 2, int start_indent = 0);
 
 }  // namespace json

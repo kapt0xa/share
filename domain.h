@@ -100,7 +100,7 @@ namespace transport_guide
 	using RouteSV = Route<string_view>;
 	using RouteS = Route<string>;
 
-	string_view string_to_sv_adapter (const string& s);
+	string_view string_to_sv_adapter(const string& s);
 
 	bool IsSetNotGetComand(string_view comand);
 

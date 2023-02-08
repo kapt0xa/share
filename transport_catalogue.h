@@ -47,7 +47,9 @@ namespace transport_guide
 	private:
 
 		struct pair_string_hasher
-		{ size_t operator()(const StopPair& data) const; };
+		{
+			size_t operator()(const StopPair& data) const;
+		};
 
 		string_view& RereferenceStringViewToLocalBusName(string_view& unlocaled_view) const;
 		string_view& RereferenceStringViewToLocalStopName(string_view& unlocaled_view) const;

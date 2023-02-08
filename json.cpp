@@ -9,13 +9,13 @@ using namespace std;
 namespace json
 {
 	const bool do_logs = true;
-	ostream* /*const*/ log_err_stream = &cerr; // can cause warnings, remove "const" to cancel warnings
+	ostream*  log_err_stream = &cerr; // can cause warnings, remove "const" to cancel warnings
 	mutex* const log_err_mutex = nullptr;
 	void LogWarning(string_view message)
 	{
 		if constexpr (do_logs)
 		{
-			assert(do_logs == static_cast<bool>(log_err_stream));
+			assert(do_logs == static_cast<bool>(log_err_stream)); // if warning here look ^^up^^, declaration of log_err_stream
 			if (log_err_mutex)
 			{
 				log_err_mutex->lock();
@@ -41,7 +41,7 @@ namespace json
 		ostream& out;
 		int indent_step = 4;
 		int indent = 0;
-		bool dont_put_bracket_in_next_line = true;
+		bool bracket_from_next_line = false;
 
 		void NextLine()
 		{
@@ -52,14 +52,13 @@ namespace json
 			}
 		}
 
-		void PrepareToOpenBracket()
+		void PrepareToBracket()
 		{
-			if (dont_put_bracket_in_next_line)
+			if (bracket_from_next_line)
 			{
-				dont_put_bracket_in_next_line = false;
-				return;
+				NextLine();
 			}
-			NextLine();
+			bracket_from_next_line = false;
 		}
 
 		PrintContext Indented()
@@ -102,16 +101,7 @@ namespace json
 				out << R"(\\)";
 				break;
 			default:
-				if (isprint(c))
-				{
-					out << c;
-				}
-				else
-				{
-					string what = "algorithn cant handle this case: string contains unprintable char with code = "s + to_string(static_cast<int>(c)) + " dec"s;
-					LogWarning(what);
-					throw (runtime_error(what));
-				}
+                out << c;
 				break;
 			}
 		}
@@ -157,7 +147,7 @@ namespace json
 	void PrintValue(const Array& arr, PrintContext& context)
 	{
 		auto& out = context.out;
-		context.PrepareToOpenBracket();
+		context.PrepareToBracket();
 		out << '[';
 		auto inside_context = context.Indented();
 		bool first_loop = true;
@@ -181,10 +171,9 @@ namespace json
 	void PrintValue(const Dict& dict, PrintContext& context)
 	{
 		auto& out = context.out;
-		context.PrepareToOpenBracket();
+		context.PrepareToBracket();
 		out << '{';
 		auto inside_context = context.Indented();
-		inside_context.dont_put_bracket_in_next_line = false;
 		bool first_loop = true;
 		for (const auto& [name, val] : dict)
 		{
@@ -199,6 +188,7 @@ namespace json
 			inside_context.NextLine();
 			PrintValue(name, inside_context);
 			out << ':' << ' ';
+			inside_context.bracket_from_next_line = true;
 			PrintValue(val, inside_context);
 		}
 		context.NextLine();
@@ -664,7 +654,7 @@ namespace json
 		}
 		if (IsInt())
 		{
-			return static_cast<double>(get<ptrdiff_t>(*this));
+			return get<ptrdiff_t>(*this);
 		}
 		throw logic_error("node doesnt hold double or int"s);
 	}

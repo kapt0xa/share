@@ -59,14 +59,19 @@ namespace transport_guide
     void ParseBusBaseRequest(const Dict& request, BaseRequests& storage)
     {
         const Array& stops_on_route = request.at(stops_key).AsArray();
+
+        bool is_line = !request.at(not_line_route_key).AsBool();
+
+        RouteS crunch(
+            stops_on_route.begin(),
+            stops_on_route.size() - (is_line ? 0 : 1),                                              // debug atention! size - 1 here!
+            [](const Node& node)-> const string& { return node.AsString(); },
+            is_line);
+
         storage.buses.push_back(
             {
                 request.at(name_key).AsString(),
-                RouteS::Route(
-                    stops_on_route.begin(),
-                    stops_on_route.size(),
-                    [](const Node& node)-> const string& { return node.AsString(); },
-                    !request.at(not_line_route_key).AsBool())
+                move(crunch)
             });
     }
 
@@ -139,10 +144,10 @@ namespace transport_guide
     InputFile ParseInputFile(const Document& input)
     {
         const Dict& root = input.GetRoot().AsMap();
-        return 
-        { 
-            ParseBaseRequests(root.at(setting_req_key).AsArray()), 
-            ParseStatRequests(root.at(getting_req_key).AsArray()) 
+        return
+        {
+            ParseBaseRequests(root.at(setting_req_key).AsArray()),
+            ParseStatRequests(root.at(getting_req_key).AsArray())
         };
     }
 
@@ -153,17 +158,17 @@ namespace transport_guide
         if (holds_alternative<Reports::Bus>(data.details))
         {
             ToJSON(get<Reports::Bus>(data.details), result);
-            return move(result);
+            return result;
         }
         if (holds_alternative<Reports::Stop>(data.details))
         {
             ToJSON(get<Reports::Stop>(data.details), result);
-            return move(result);
+            return result;
         }
         if (holds_alternative<Reports::Error>(data.details))
         {
             ToJSON(get<Reports::Error>(data.details), result);
-            return move(result);
+            return result;
         }
         assert(false);
     }
@@ -176,7 +181,7 @@ namespace transport_guide
         storage[unique_stops_key] = Node(static_cast<ptrdiff_t>(data.details.unique_stop_count));
     }
 
-    void ToJSON(const Reports::Stop& data, Dict& storage) 
+    void ToJSON(const Reports::Stop& data, Dict& storage)
     {
         Array buses_pre_node;
         buses_pre_node.reserve(data.details.size());
@@ -208,8 +213,8 @@ namespace transport_guide
         return ParseInputFile(Load(in));
     }
 
-    void PrintReports( const Reports& data, ostream& out)
+    void PrintReports(const Reports& data, ostream& out)
     {
-        Print(ToJSON(data), out, 4);
+        Print(ToJSON(data), out);
     }
 }

@@ -40,11 +40,11 @@ namespace transport_guide
 		const string error_msg_key = "error_message"s;
 	}
 
-    BaseRequests ParseBaseRequests(const Array& nodes_with_base_requests);
+	BaseRequests ParseBaseRequests(const Array& nodes_with_base_requests);
 
-    StatRequests ParseStatRequests(const Array& nodes_with_stat_requests);
+	StatRequests ParseStatRequests(const Array& nodes_with_stat_requests);
 
-    InputFile ParseInputFile(const Document& input);
+	InputFile ParseInputFile(const Document& input);
 
 	Document ToJSON(const Reports& data);
 
